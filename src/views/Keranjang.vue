@@ -1,4 +1,5 @@
 <script setup>
+import router from "@/router";
 import axios from "axios";
 
 import Swal from 'sweetalert2/dist/sweetalert2.all.js';
@@ -49,6 +50,22 @@ const hapusKeranjangItem = (id) => {
             console.error('Error deleting item:', error);
         });
 }
+
+const hapusKeranjangItemPesan = (id) => {
+    axios
+        .delete(`http://localhost:3000/keranjangs/${id}`)
+        .then((response) => {
+            keranjangs.value = keranjangs.value.filter(function (item) {
+                return item.id !== id
+            })
+
+        })
+        .catch((error) => {
+            console.error('Error deleting item:', error);
+        });
+}
+
+
 const pesanMeja = () => {
   const dataPesan = {
     ...pesanBooking.value,
@@ -58,12 +75,15 @@ const pesanMeja = () => {
     .then((response) => {
       // Hapus semua item dari keranjang setelah pesanan berhasil dibuat
       keranjangs.value.forEach(item => {
-        hapusKeranjangItem(item.id);
+        hapusKeranjangItemPesan(item.id);
       });
       Swal.fire({
         icon: 'success',
         title: 'Sukses Membeli!',
         text: 'Terimaksih telah membeli produk kami!'
+      }).then(() => {
+        // Arahkan pengguna kembali ke halaman utama setelah SweetAlert dikonfirmasi
+        router.push('/');
       });
     })
     .catch((error) => {
